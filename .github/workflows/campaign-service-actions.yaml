@@ -2,8 +2,6 @@
 name: SERVICES-CI
 on: 
   push:
-    branches:
-      - main
     paths:
       - backend/campaign-service/**
       - .github/workflows/campaign-service-actions.yaml
