@@ -6,7 +6,7 @@ on:
       - backend/campaign-service/**
       - .github/workflows/campaign-service-actions.yaml
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
@@ -24,3 +24,13 @@ jobs:
       - name: Run tests
         run: yarn test
         working-directory: ./backend/campaign-service
+  sast:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository code
+      uses: actions/checkout@v2
+    - name: nodejsscan scan
+      id: njsscan
+      uses: ajinabraham/njsscan-action@master
+      with:
+        args: '.'
