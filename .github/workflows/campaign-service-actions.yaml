@@ -1,5 +1,5 @@
 # ci-pipeline for services
-name: SERVICES-CI
+name: campaign-service-ci
 on: 
   push:
     paths:
