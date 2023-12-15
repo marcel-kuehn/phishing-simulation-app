@@ -78,6 +78,4 @@ describe('CatService', () => {
   });
 });*/
 
-describe('CampaignsService', () => {
-  
-});
+describe('CampaignsService', () => {});

@@ -4,7 +4,6 @@ import { ErrorTypes } from 'src/errors/errors.constants';
 
 @Catch(Error.ValidationError)
 export class MongoValidationErrorFilter implements RpcExceptionFilter {
-
   catch(exception: Error.ValidationError, host: ArgumentsHost): any {
     console.error(exception);
 
