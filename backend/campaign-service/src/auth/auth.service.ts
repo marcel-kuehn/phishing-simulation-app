@@ -1,13 +1,53 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { UsersService } from '../users/users.service';
 import mongoose from 'mongoose';
-import { ErrorTypes } from 'src/errors/errors.constants';
+import { SignInDto, SignUpDto } from './auth.dto';
+import { jwtConstants } from 'src/constants';
 
 @Injectable()
 export class AuthService {
-  getUserId = (bearer: string): mongoose.Types.ObjectId => {
-    // TODO -> implement auth
-    if (bearer) return new mongoose.Types.ObjectId('507f1f77bcf86cd799439011');
+  constructor(
+    private usersService: UsersService,
+    private jwtService: JwtService,
+  ) {}
 
-    throw new UnauthorizedException(ErrorTypes.AUTH_HEADER_INVALID);
-  };
+  async generateAccessToken(userId: mongoose.Types.ObjectId): Promise<string> {
+    return this.jwtService.signAsync(
+      { userId: userId.toString() },
+      { secret: jwtConstants.secret },
+    );
+  }
+
+  async generateRefreshToken(userId: mongoose.Types.ObjectId): Promise<string> {
+    return this.jwtService.signAsync({ userId: userId.toString() });
+  }
+
+  async signIn(signInDto: SignInDto): Promise<{
+    userId: mongoose.Types.ObjectId;
+    accessToken: string;
+    refreshToken: string;
+  }> {
+    const userId = await this.usersService.verifyUserCredentials(signInDto);
+
+    return {
+      userId,
+      accessToken: await this.generateAccessToken(userId),
+      refreshToken: await this.generateRefreshToken(userId),
+    };
+  }
+
+  async signUp(signUpDto: SignUpDto): Promise<{
+    userId: mongoose.Types.ObjectId;
+    accessToken: string;
+    refreshToken: string;
+  } | null> {
+    const userId = await this.usersService.create(signUpDto);
+
+    return {
+      userId,
+      accessToken: await this.generateAccessToken(userId),
+      refreshToken: await this.generateRefreshToken(userId),
+    };
+  }
 }

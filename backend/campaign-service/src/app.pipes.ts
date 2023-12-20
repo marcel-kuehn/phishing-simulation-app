@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common';
 import mongoose from 'mongoose';
-import { ErrorTypes } from './errors/errors.constants';
+import { ErrorTypes } from './constants';
 
 @Injectable()
 export class ValidateMongoId implements PipeTransform<mongoose.Types.ObjectId> {
@@ -9,9 +9,9 @@ export class ValidateMongoId implements PipeTransform<mongoose.Types.ObjectId> {
       if (mongoose.Types.ObjectId.isValid(value)) {
         return new mongoose.Types.ObjectId(value);
       }
-      throw new BadRequestException(ErrorTypes.INVALID_ID_FORMAT);
+      throw new BadRequestException(ErrorTypes.INVALID_MONGO_ID_FORMAT);
     } catch {
-      throw new BadRequestException(ErrorTypes.INVALID_ID_FORMAT);
+      throw new BadRequestException(ErrorTypes.INVALID_MONGO_ID_FORMAT);
     }
   }
 }

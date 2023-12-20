@@ -1,14 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
-import { ErrorTypes } from './errors/errors.constants';
-import { MongoValidationErrorFilter } from './database/database.filters';
-import { ApiAuthGuard } from './auth/auth.guard';
-import { AuthService } from './auth/auth.service';
+import { ErrorTypes } from './constants';
+import {
+  MongoDuplicationErrorFilter,
+  MongoValidationErrorFilter,
+} from './database/database.filters';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalGuards(new ApiAuthGuard(new AuthService()));
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -20,6 +20,7 @@ async function bootstrap() {
     }),
   );
   app.useGlobalFilters(new MongoValidationErrorFilter());
+  app.useGlobalFilters(new MongoDuplicationErrorFilter());
   await app.listen(3000);
 }
 bootstrap();
