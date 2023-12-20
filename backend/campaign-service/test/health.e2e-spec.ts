@@ -3,13 +3,13 @@ import * as request from 'supertest';
 import { StatusMessages } from '../src/constants';
 import { createTestApp } from './createTestApp';
 
-describe('AppController (e2e)', () => {
+describe('HealthController (e2e)', () => {
   let app: INestApplication;
 
   beforeEach(async () => {
     app = await createTestApp();
     await app.init();
-   });
+  });
 
   it('/health (GET)', () => {
     return request(app.getHttpServer())
