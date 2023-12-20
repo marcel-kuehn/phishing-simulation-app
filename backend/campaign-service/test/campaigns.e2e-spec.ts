@@ -42,6 +42,18 @@ describe('CampaignsController (e2e)', () => {
     expect(test.body._id).toBeDefined();
   });
 
+  it('/campaigns (POST) should not be accessible without valid auth', async () => {
+    request(app.getHttpServer())
+      .post('/campaigns')
+      .set('Authorization', 'Bearer wadjo30489w3peiof')
+      .send({
+        mailListId: '6582f7916c67fab161df17d7',
+        name: 'Test',
+        monthlyMailFrequency: 30,
+      })
+      .expect(401);
+  });
+
   it('/campaigns (POST) should data is malformed', async () => {
     request(app.getHttpServer())
       .post('/campaigns')
@@ -80,14 +92,7 @@ describe('CampaignsController (e2e)', () => {
       .expect(400);
   });
 
-  it('/campaigns (GET) should return 404, when campaign was not found', async () => {
-    await request(app.getHttpServer())
-      .get(`/campaigns/6582f7916c67fab161df17d7`)
-      .set('Authorization', `Bearer ${accessToken}`)
-      .expect(404);
-  });
-
-  it('/campaigns (GET) should work', async () => {
+  it('/campaigns/:id (GET) should work', async () => {
     const createCampaignRequest = await request(app.getHttpServer())
       .post('/campaigns')
       .set('Authorization', `Bearer ${accessToken}`)
@@ -105,7 +110,21 @@ describe('CampaignsController (e2e)', () => {
       .expect(createCampaignRequest.body);
   });
 
-  it('/campaigns (GET) should send 403, when trying to access a campaign that is not owned', async () => {
+  it('/campaigns/:id (GET) should return 404, when campaign was not found', async () => {
+    await request(app.getHttpServer())
+      .get(`/campaigns/6582f7916c67fab161df17d7`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(404);
+  });
+
+  it('/campaigns/:id (GET) should not be accessible without valid auth', async () => {
+    await request(app.getHttpServer())
+      .get(`/campaigns/6582f7916c67fab161df17d7`)
+      .set('Authorization', `Bearer 3efeawdaw`)
+      .expect(401);
+  });
+
+  it('/campaigns/:id (GET) should send 403, when trying to access a campaign that is not owned', async () => {
     const signUpRequest = await request(app.getHttpServer())
       .post('/auth/signup')
       .send({
@@ -151,6 +170,13 @@ describe('CampaignsController (e2e)', () => {
       .get(`/campaigns/${createCampaignRequest.body._id}`)
       .set('Authorization', `Bearer ${accessToken}`)
       .expect(404);
+  });
+
+  it('/campaigns/:id (DELETE) should not be accessible without valid auth', async () => {
+    await request(app.getHttpServer())
+      .delete(`/campaigns/6582f7916c67fab161df17d7`)
+      .set('Authorization', `Bearer 3efeawdaw`)
+      .expect(401);
   });
 
   it('/campaigns (DELETE) should send 403, when trying to delete a campaign that is not owned', async () => {
