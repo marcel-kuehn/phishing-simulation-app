@@ -81,4 +81,26 @@ describe('AuthController (e2e)', () => {
     expect(test.body.accessToken).toBeDefined();
     expect(test.body.refreshToken).toBeDefined();
   });
+
+  it('/auth/signin (POST) should send 401, when credentials are missing or wrong', async () => {
+    const email = `test${Date.now()}@test.de`;
+    await request(app.getHttpServer())
+      .post('/auth/signup')
+      .send({ email, name: 'Mr. Bean', password: 'I5_Thi5_PW_Secure?!' })
+      .expect(201);
+
+    request(app.getHttpServer())
+      .post('/auth/signin')
+      .send({ email, password: '12345' })
+      .expect(401);
+    
+    request(app.getHttpServer())
+      .post('/auth/signin')
+      .send({ email: `${email}e`, password: 'I5_Thi5_PW_Secure?!' })
+      .expect(401);
+
+    request(app.getHttpServer())
+      .post('/auth/signin')
+      .expect(401);
+  });
 });
