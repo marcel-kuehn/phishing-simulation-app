@@ -93,14 +93,12 @@ describe('AuthController (e2e)', () => {
       .post('/auth/signin')
       .send({ email, password: '12345' })
       .expect(401);
-    
+
     request(app.getHttpServer())
       .post('/auth/signin')
       .send({ email: `${email}e`, password: 'I5_Thi5_PW_Secure?!' })
       .expect(401);
 
-    request(app.getHttpServer())
-      .post('/auth/signin')
-      .expect(401);
+    request(app.getHttpServer()).post('/auth/signin').expect(401);
   });
 });
