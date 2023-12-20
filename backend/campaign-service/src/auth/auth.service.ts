@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import mongoose from 'mongoose';
 import { SignInDto, SignUpDto } from './auth.dto';
-import { jwtConstants } from 'src/constants';
+import { jwtConstants } from '../constants';
 
 @Injectable()
 export class AuthService {

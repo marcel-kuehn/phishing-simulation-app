@@ -1,8 +1,8 @@
 import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
 import { User } from './user.schema';
 import mongoose from 'mongoose';
-import { SignInDto, SignUpDto } from 'src/auth/auth.dto';
-import { ErrorTypes } from 'src/constants';
+import { SignInDto, SignUpDto } from '../auth/auth.dto';
+import { ErrorTypes } from '../constants';
 
 @Injectable()
 export class UsersService {
