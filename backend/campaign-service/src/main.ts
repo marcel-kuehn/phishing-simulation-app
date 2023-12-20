@@ -14,7 +14,7 @@ async function bootstrap() {
       whitelist: true,
       forbidNonWhitelisted: true,
       exceptionFactory: (errors) => {
-        console.error(errors);
+        console.log(errors);
         throw new BadRequestException(ErrorTypes.INVALID_DTO_FORMAT);
       },
     }),

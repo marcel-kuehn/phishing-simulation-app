@@ -1,11 +1,11 @@
 import { ArgumentsHost, Catch, RpcExceptionFilter } from '@nestjs/common';
 import mongoose from 'mongoose';
-import { ErrorTypes } from 'src/constants';
+import { ErrorTypes } from '../constants';
 
 @Catch(mongoose.Error.ValidationError)
 export class MongoValidationErrorFilter implements RpcExceptionFilter {
   catch(exception: mongoose.Error.ValidationError, host: ArgumentsHost): any {
-    console.error(exception);
+    console.log(exception);
 
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
@@ -21,7 +21,7 @@ export class MongoValidationErrorFilter implements RpcExceptionFilter {
 @Catch(mongoose.mongo.MongoError)
 export class MongoDuplicationErrorFilter implements RpcExceptionFilter {
   catch(exception: mongoose.mongo.MongoError, host: ArgumentsHost): any {
-    console.error(exception);
+    console.log(exception);
 
     if (exception.name !== 'MongoServerError' && exception.code !== '11000') {
       throw exception;

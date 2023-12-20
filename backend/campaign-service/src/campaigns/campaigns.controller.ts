@@ -16,8 +16,8 @@ import { DeleteResult } from 'mongodb';
 import { ErrorTypes } from '../constants';
 import mongoose from 'mongoose';
 import { ValidateMongoId } from '../app.pipes';
-import { JwtAuthGuard } from 'src/auth/auth.guard';
-import { AuthUserId } from 'src/auth/auth.decorators';
+import { JwtAuthGuard } from '../auth/auth.guard';
+import { AuthUserId } from '../auth/auth.decorators';
 
 @Controller('campaigns')
 export class CampaignsController {
