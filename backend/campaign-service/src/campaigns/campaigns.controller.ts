@@ -8,6 +8,7 @@ import {
   NotFoundException,
   ForbiddenException,
   UseGuards,
+  Put,
 } from '@nestjs/common';
 import { CampaignsService } from './campaigns.service';
 import { CreateCampaignDto } from './campaign.dto';
@@ -40,7 +41,7 @@ export class CampaignsController {
   ): Promise<Campaign> {
     const campaign = await this.campaignsService.findOne(id);
     if (!campaign) throw new NotFoundException(ErrorTypes.DOCUMENT_NOT_FOUND);
-    if (campaign.ownerId.toString() !== authUserId.toString())
+    if (campaign.toJSON().ownerId.toString() !== authUserId.toString())
       throw new ForbiddenException(ErrorTypes.NO_ACCESS_RIGHTS_TO_RESOURCE);
 
     return campaign;
@@ -54,9 +55,24 @@ export class CampaignsController {
   ): Promise<DeleteResult> {
     const campaign = await this.campaignsService.findOne(id);
     if (!campaign) throw new NotFoundException(ErrorTypes.DOCUMENT_NOT_FOUND);
-    if (campaign.ownerId.toString() !== authUserId.toString())
+    if (campaign.toJSON().ownerId.toString() !== authUserId.toString())
       throw new ForbiddenException(ErrorTypes.NO_ACCESS_RIGHTS_TO_RESOURCE);
 
     return this.campaignsService.remove(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put(':id')
+  async update(
+    @Param('id', ValidateMongoId) id: mongoose.Types.ObjectId,
+    @Body() createCampaignDto: CreateCampaignDto,
+    @AuthUserId() authUserId: mongoose.Types.ObjectId,
+  ): Promise<Campaign> {
+    const campaign = await this.campaignsService.findOne(id);
+    if (!campaign) throw new NotFoundException(ErrorTypes.DOCUMENT_NOT_FOUND);
+    if (campaign.toJSON().ownerId.toString() !== authUserId.toString())
+      throw new ForbiddenException(ErrorTypes.NO_ACCESS_RIGHTS_TO_RESOURCE);
+
+    return this.campaignsService.update(campaign, createCampaignDto);
   }
 }

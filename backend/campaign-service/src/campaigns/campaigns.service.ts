@@ -21,6 +21,14 @@ export class CampaignsService {
     });
   }
 
+  async update(campaign: Campaign, createCampaignDto: CreateCampaignDto): Promise<Campaign> {
+    for(const property of Object.keys(createCampaignDto)) {
+      campaign[property] = createCampaignDto[property];
+    }
+
+    return await campaign.save();
+  }
+
   async findOne(id: mongoose.Types.ObjectId): Promise<Campaign | null> {
     return this.campaignModel.findOne({ _id: id }).exec();
   }

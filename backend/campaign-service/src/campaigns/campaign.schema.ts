@@ -24,4 +24,4 @@ export const CampaignSchema = new mongoose.Schema(
   },
 );
 
-export type Campaign = mongoose.InferSchemaType<typeof CampaignSchema>;
+export type Campaign = mongoose.Document<mongoose.InferSchemaType<typeof CampaignSchema>>;
