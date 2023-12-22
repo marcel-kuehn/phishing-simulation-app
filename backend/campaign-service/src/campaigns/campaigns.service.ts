@@ -21,8 +21,11 @@ export class CampaignsService {
     });
   }
 
-  async update(campaign: Campaign, createCampaignDto: CreateCampaignDto): Promise<Campaign> {
-    for(const property of Object.keys(createCampaignDto)) {
+  async update(
+    campaign: Campaign,
+    createCampaignDto: CreateCampaignDto,
+  ): Promise<Campaign> {
+    for (const property of Object.keys(createCampaignDto)) {
       campaign[property] = createCampaignDto[property];
     }
 
@@ -35,5 +38,11 @@ export class CampaignsService {
 
   async remove(id: mongoose.Types.ObjectId): Promise<DeleteResult> {
     return this.campaignModel.deleteOne({ _id: id });
+  }
+
+  async findByMailList(
+    mailListId: mongoose.Types.ObjectId,
+  ): Promise<Campaign[]> {
+    return this.campaignModel.find({ mailListId });
   }
 }

@@ -14,7 +14,7 @@ describe('CampaignsController (e2e)', () => {
     const test = await request(app.getHttpServer())
       .post('/auth/signup')
       .send({
-        email: `test${Date.now()}@test.de`,
+        email: `test${Date.now() * Math.floor(Math.random() * 100000)}@test.de`,
         name: 'Mr. Bean',
         password: 'I5_Thi5_PW_Secure?!',
       })
@@ -25,18 +25,26 @@ describe('CampaignsController (e2e)', () => {
   });
 
   it('/campaigns (POST) should work', async () => {
+    const mailListData = await request(app.getHttpServer())
+      .post('/mail-lists')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        name: 'Test',
+      })
+      .expect(201);
+
     const test = await request(app.getHttpServer())
       .post('/campaigns')
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
-        mailListId: '6582f7916c67fab161df17d7',
+        mailListId: mailListData.body._id,
         name: 'Test',
         monthlyMailFrequency: 30,
       })
       .expect(201);
 
     expect(test.body.name).toStrictEqual('Test');
-    expect(test.body.mailListId).toStrictEqual('6582f7916c67fab161df17d7');
+    expect(test.body.mailListId).toStrictEqual(mailListData.body._id);
     expect(test.body.monthlyMailFrequency).toStrictEqual(30);
     expect(test.body.ownerId).toStrictEqual(userId);
     expect(test.body._id).toBeDefined();
@@ -54,12 +62,61 @@ describe('CampaignsController (e2e)', () => {
       .expect(401);
   });
 
-  it('/campaigns (POST) should send 400, when data is malformed', async () => {
-    request(app.getHttpServer())
+  it('/campaigns (POST) should send 400, when mailList does not exist', async () => {
+    await request(app.getHttpServer())
       .post('/campaigns')
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
         mailListId: '6582f7916c67fab161df17d7',
+        name: 'Test',
+        monthlyMailFrequency: 30,
+      })
+      .expect(400);
+  });
+
+  it('/campaigns (POST) should send 403, when mailList is not owned', async () => {
+    const signUpRequest = await request(app.getHttpServer())
+      .post('/auth/signup')
+      .send({
+        email: `test${Date.now() * Math.floor(Math.random() * 100000)}@test.de`,
+        name: 'Mr. Bean',
+        password: 'I5_Thi5_PW_Secure?!',
+      })
+      .expect(201);
+
+    const mailListNotOwnedData = await request(app.getHttpServer())
+      .post('/mail-lists')
+      .set('Authorization', `Bearer ${signUpRequest.body.accessToken}`)
+      .send({
+        name: 'Test',
+      })
+      .expect(201);
+
+    await request(app.getHttpServer())
+      .post('/campaigns')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        mailListId: mailListNotOwnedData.body._id,
+        name: 'Test',
+        monthlyMailFrequency: 30,
+      })
+      .expect(403);
+  });
+
+  it('/campaigns (POST) should send 400, when data is malformed', async () => {
+    const mailListData = await request(app.getHttpServer())
+      .post('/mail-lists')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        name: 'Test',
+      })
+      .expect(201);
+
+    request(app.getHttpServer())
+      .post('/campaigns')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        mailListId: mailListData.body._id,
         name: 'Test',
         monthlyMailFrequency: -1,
       })
@@ -85,7 +142,7 @@ describe('CampaignsController (e2e)', () => {
       .post('/campaigns')
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
-        mailListId: '6582f7916c67fab161df17d7',
+        mailListId: mailListData.body._id,
         name: '',
         monthlyMailFrequency: 30,
       })
@@ -93,21 +150,35 @@ describe('CampaignsController (e2e)', () => {
   });
 
   it('/campaigns/:id (GET) should work', async () => {
+    const mailListData = await request(app.getHttpServer())
+      .post('/mail-lists')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        name: 'Test',
+      })
+      .expect(201);
+
     const createCampaignRequest = await request(app.getHttpServer())
       .post('/campaigns')
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
-        mailListId: '6582f7916c67fab161df17d7',
+        mailListId: mailListData.body._id,
         name: 'Test',
         monthlyMailFrequency: 30,
       })
       .expect(201);
 
-    await request(app.getHttpServer())
+    const test = await request(app.getHttpServer())
       .get(`/campaigns/${createCampaignRequest.body._id}`)
       .set('Authorization', `Bearer ${accessToken}`)
       .expect(200)
       .expect(createCampaignRequest.body);
+
+    expect(test.body.name).toStrictEqual('Test');
+    expect(test.body.mailListId).toStrictEqual(mailListData.body._id);
+    expect(test.body.monthlyMailFrequency).toStrictEqual(30);
+    expect(test.body.ownerId).toStrictEqual(userId);
+    expect(test.body._id).toStrictEqual(createCampaignRequest.body._id);
   });
 
   it('/campaigns/:id (GET) should return 404, when campaign was not found', async () => {
@@ -128,9 +199,17 @@ describe('CampaignsController (e2e)', () => {
     const signUpRequest = await request(app.getHttpServer())
       .post('/auth/signup')
       .send({
-        email: `test${Date.now()}@test.de`,
+        email: `test${Date.now() * Math.floor(Math.random() * 100000)}@test.de`,
         name: 'Mr. Bean',
         password: 'I5_Thi5_PW_Secure?!',
+      })
+      .expect(201);
+
+    const mailListData = await request(app.getHttpServer())
+      .post('/mail-lists')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        name: 'Test',
       })
       .expect(201);
 
@@ -138,7 +217,7 @@ describe('CampaignsController (e2e)', () => {
       .post('/campaigns')
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
-        mailListId: '6582f7916c67fab161df17d7',
+        mailListId: mailListData.body._id,
         name: 'Test',
         monthlyMailFrequency: 30,
       })
@@ -151,11 +230,19 @@ describe('CampaignsController (e2e)', () => {
   });
 
   it('/campaigns/:id (DELETE) should work', async () => {
+    const mailListData = await request(app.getHttpServer())
+      .post('/mail-lists')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        name: 'Test',
+      })
+      .expect(201);
+
     const createCampaignRequest = await request(app.getHttpServer())
       .post('/campaigns')
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
-        mailListId: '6582f7916c67fab161df17d7',
+        mailListId: mailListData.body._id,
         name: 'Test',
         monthlyMailFrequency: 30,
       })
@@ -183,9 +270,17 @@ describe('CampaignsController (e2e)', () => {
     const signUpRequest = await request(app.getHttpServer())
       .post('/auth/signup')
       .send({
-        email: `test${Date.now()}@test.de`,
+        email: `test${Date.now() * Math.floor(Math.random() * 100000)}@test.de`,
         name: 'Mr. Bean',
         password: 'I5_Thi5_PW_Secure?!',
+      })
+      .expect(201);
+
+    const mailListData = await request(app.getHttpServer())
+      .post('/mail-lists')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        name: 'Test',
       })
       .expect(201);
 
@@ -193,7 +288,7 @@ describe('CampaignsController (e2e)', () => {
       .post('/campaigns')
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
-        mailListId: '6582f7916c67fab161df17d7',
+        mailListId: mailListData.body._id,
         name: 'Test',
         monthlyMailFrequency: 30,
       })
@@ -206,20 +301,36 @@ describe('CampaignsController (e2e)', () => {
   });
 
   it('/campaigns/:id (PUT) should work', async () => {
+    const mailListData = await request(app.getHttpServer())
+      .post('/mail-lists')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        name: 'Test',
+      })
+      .expect(201);
+
     const createCampaignRequest = await request(app.getHttpServer())
       .post('/campaigns')
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
-        mailListId: '6582f7916c67fab161df17d7',
+        mailListId: mailListData.body._id,
         name: 'Test',
         monthlyMailFrequency: 30,
+      })
+      .expect(201);
+
+    const mailListData2 = await request(app.getHttpServer())
+      .post('/mail-lists')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        name: 'Test',
       })
       .expect(201);
 
     const test = await request(app.getHttpServer())
       .put(`/campaigns/${createCampaignRequest.body._id}`)
       .send({
-        mailListId: '6582f7916c67fab161df17d8',
+        mailListId: mailListData2.body._id,
         name: 'Test 2',
         monthlyMailFrequency: 15,
       })
@@ -227,7 +338,7 @@ describe('CampaignsController (e2e)', () => {
       .expect(200);
 
     expect(test.body.name).toStrictEqual('Test 2');
-    expect(test.body.mailListId).toStrictEqual('6582f7916c67fab161df17d8');
+    expect(test.body.mailListId).toStrictEqual(mailListData2.body._id);
     expect(test.body.monthlyMailFrequency).toStrictEqual(15);
     expect(test.body.ownerId).toStrictEqual(userId);
     expect(test.body._id).toStrictEqual(createCampaignRequest.body._id);
@@ -244,9 +355,17 @@ describe('CampaignsController (e2e)', () => {
     const signUpRequest = await request(app.getHttpServer())
       .post('/auth/signup')
       .send({
-        email: `test${Date.now()}@test.de`,
+        email: `test${Date.now() * Math.floor(Math.random() * 100000)}@test.de`,
         name: 'Mr. Bean',
         password: 'I5_Thi5_PW_Secure?!',
+      })
+      .expect(201);
+
+    const mailListData = await request(app.getHttpServer())
+      .post('/mail-lists')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        name: 'Test',
       })
       .expect(201);
 
@@ -254,7 +373,7 @@ describe('CampaignsController (e2e)', () => {
       .post('/campaigns')
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
-        mailListId: '6582f7916c67fab161df17d7',
+        mailListId: mailListData.body._id,
         name: 'Test',
         monthlyMailFrequency: 30,
       })
@@ -271,12 +390,97 @@ describe('CampaignsController (e2e)', () => {
       .expect(403);
   });
 
-  it('/campaigns/:id (PUT) should send 400, when data is malformed', async () => {
+  it('/campaigns/:id (PUT) should send 403, when updating campaign with mailList that is not owned', async () => {
+    const signUpRequest = await request(app.getHttpServer())
+      .post('/auth/signup')
+      .send({
+        email: `test${Date.now() * Math.floor(Math.random() * 100000)}@test.de`,
+        name: 'Mr. Bean',
+        password: 'I5_Thi5_PW_Secure?!',
+      })
+      .expect(201);
+
+    const mailListOwnedData = await request(app.getHttpServer())
+      .post('/mail-lists')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        name: 'Test',
+      })
+      .expect(201);
+
+    const mailListNotOwnedData = await request(app.getHttpServer())
+      .post('/mail-lists')
+      .set('Authorization', `Bearer ${signUpRequest.body.accessToken}`)
+      .send({
+        name: 'Test',
+      })
+      .expect(201);
+
     const createCampaignRequest = await request(app.getHttpServer())
       .post('/campaigns')
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
-        mailListId: '6582f7916c67fab161df17d7',
+        mailListId: mailListOwnedData.body._id,
+        name: 'Test',
+        monthlyMailFrequency: 30,
+      })
+      .expect(201);
+
+    await request(app.getHttpServer())
+      .put(`/campaigns/${createCampaignRequest.body._id}`)
+      .send({
+        mailListId: mailListNotOwnedData.body._id,
+        name: 'Test 2',
+        monthlyMailFrequency: 15,
+      })
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(403);
+  });
+
+  it('/campaigns/:id (PUT) should send 400, when mailList does not exist', async () => {
+    const mailListData = await request(app.getHttpServer())
+      .post('/mail-lists')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        name: 'Test',
+      })
+      .expect(201);
+
+    const createCampaignRequest = await request(app.getHttpServer())
+      .post('/campaigns')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        mailListId: mailListData.body._id,
+        name: 'Test',
+        monthlyMailFrequency: 30,
+      })
+      .expect(201);
+
+    await request(app.getHttpServer())
+      .put(`/campaigns/${createCampaignRequest.body._id}`)
+      .send({
+        mailListId: '6582f7916c67fab161df17d8',
+        name: 'Test 2',
+        monthlyMailFrequency: 15,
+      })
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(400);
+  });
+
+  it('/campaigns/:id (PUT) should send 400, when data is malformed', async () => {
+    const mailListData = await request(app.getHttpServer())
+      .post('/mail-lists')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        name: 'Test',
+      })
+      .expect(201);
+
+    const createCampaignRequest = await request(app.getHttpServer())
+      .post('/campaigns')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        mailListId: mailListData.body._id,
         name: 'Test',
         monthlyMailFrequency: 30,
       })
@@ -286,7 +490,7 @@ describe('CampaignsController (e2e)', () => {
       .put(`/campaigns/${createCampaignRequest.body._id}`)
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
-        mailListId: '6582f7916c67fab161df17d7',
+        mailListId: mailListData.body._id,
         name: 'Test',
         monthlyMailFrequency: -1,
       })
@@ -312,7 +516,7 @@ describe('CampaignsController (e2e)', () => {
       .put(`/campaigns/${createCampaignRequest.body._id}`)
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
-        mailListId: '6582f7916c67fab161df17d7',
+        mailListId: mailListData.body._id,
         name: '',
         monthlyMailFrequency: 30,
       })
