@@ -12,7 +12,7 @@ export class UsersService {
   ) {}
 
   async findOne(id: mongoose.Types.ObjectId): Promise<User | null> {
-    return this.userModel.findOne({ _id: id }).exec();
+    return this.userModel.findOne({ _id: id }).lean().exec();
   }
 
   async verifyUserCredentials(
@@ -20,6 +20,7 @@ export class UsersService {
   ): Promise<mongoose.Types.ObjectId> {
     const user = await this.userModel
       .findOne({ email: signInDto.email, password: signInDto.password })
+      .lean()
       .exec();
     if (!user) throw new ForbiddenException(ErrorTypes.INVALID_CREDENTIALS);
 
