@@ -64,7 +64,7 @@ describe('MailListsController (e2e)', () => {
       .expect(400);
   });
 
-  it('/mail-lists/:id (GET) should work', async () => {
+  it('/mail-lists (GET) should work', async () => {
     const createMailListRequest = await request(app.getHttpServer())
       .post('/mail-lists')
       .set('Authorization', `Bearer ${accessToken}`)
@@ -74,52 +74,17 @@ describe('MailListsController (e2e)', () => {
       .expect(201);
 
     const test = await request(app.getHttpServer())
-      .get(`/mail-lists/${createMailListRequest.body._id}`)
+      .get(`/mail-lists`)
       .set('Authorization', `Bearer ${accessToken}`)
       .expect(200)
-      .expect(createMailListRequest.body);
-
-    expect(test.body.name).toStrictEqual('Test');
-    expect(test.body.ownerId).toStrictEqual(userId);
-    expect(test.body._id).toBeDefined();
-  });
-
-  it('/mail-lists/:id (GET) should return 404, when MailList was not found', async () => {
-    await request(app.getHttpServer())
-      .get(`/mail-lists/6582f7916c67fab161df17d7`)
-      .set('Authorization', `Bearer ${accessToken}`)
-      .expect(404);
+      .expect([createMailListRequest.body]);
   });
 
   it('/mail-lists/:id (GET) should not be accessible, without valid auth', async () => {
     await request(app.getHttpServer())
-      .get(`/mail-lists/6582f7916c67fab161df17d7`)
+      .get(`/mail-lists`)
       .set('Authorization', `Bearer 3efeawdaw`)
       .expect(401);
-  });
-
-  it('/mail-lists/:id (GET) should send 403, when trying to access a MailList that is not owned', async () => {
-    const signUpRequest = await request(app.getHttpServer())
-      .post('/auth/signup')
-      .send({
-        email: `test${Date.now() * Math.floor(Math.random() * 100000)}@test.de`,
-        name: 'Mr. Bean',
-        password: 'I5_Thi5_PW_Secure?!',
-      })
-      .expect(201);
-
-    const createMailListRequest = await request(app.getHttpServer())
-      .post('/mail-lists')
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send({
-        name: 'Test',
-      })
-      .expect(201);
-
-    await request(app.getHttpServer())
-      .get(`/mail-lists/${createMailListRequest.body._id}`)
-      .set('Authorization', `Bearer ${signUpRequest.body.accessToken}`)
-      .expect(403);
   });
 
   it('/mail-lists/:id (DELETE) should work', async () => {

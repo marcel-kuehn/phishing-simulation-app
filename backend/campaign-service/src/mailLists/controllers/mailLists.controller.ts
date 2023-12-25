@@ -43,17 +43,11 @@ export class MailListsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get(':id')
-  async findOne(
-    @Param('id', ValidateMongoId) id: mongoose.Types.ObjectId,
+  @Get()
+  async find(
     @AuthUserId() authUserId: mongoose.Types.ObjectId,
-  ): Promise<MailList> {
-    const mailList = await this.mailListsService.findOne(id);
-    if (!mailList) throw new NotFoundException(ErrorTypes.DOCUMENT_NOT_FOUND);
-    if (mailList.ownerId.toString() !== authUserId.toString())
-      throw new ForbiddenException(ErrorTypes.NO_ACCESS_RIGHTS_TO_RESOURCE);
-
-    return mailList;
+  ): Promise<MailList[]> {
+    return this.mailListsService.find(authUserId);
   }
 
   @UseGuards(JwtAuthGuard)
