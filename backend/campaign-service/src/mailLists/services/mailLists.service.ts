@@ -40,8 +40,10 @@ export class MailListsService {
     return this.mailListModel.find({ ownerId }).lean().exec();
   }
 
-  async findOneAsDocument(id: mongoose.Types.ObjectId): Promise<mongoose.Document<MailList> | null> {
-    return this.mailListModel.findOne({ _id: id })
+  async findOneAsDocument(
+    id: mongoose.Types.ObjectId,
+  ): Promise<mongoose.Document<MailList> | null> {
+    return this.mailListModel.findOne({ _id: id });
   }
 
   async deleteOne(id: mongoose.Types.ObjectId): Promise<DeleteResult> {

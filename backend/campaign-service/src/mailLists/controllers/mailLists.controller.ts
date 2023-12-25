@@ -61,7 +61,7 @@ export class MailListsController {
     if (mailList.ownerId.toString() !== authUserId.toString())
       throw new ForbiddenException(ErrorTypes.NO_ACCESS_RIGHTS_TO_RESOURCE);
 
-    const campaigns = await this.campaignsService.find(id);
+    const campaigns = await this.campaignsService.findByMailListId(id);
     if (campaigns.length > 0)
       throw new ConflictException(
         ErrorTypes.DELETE_BLOCKED_BY_DEPENDENT_RESOURCE,

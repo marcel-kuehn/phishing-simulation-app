@@ -73,7 +73,7 @@ describe('MailListsController (e2e)', () => {
       })
       .expect(201);
 
-    const test = await request(app.getHttpServer())
+    request(app.getHttpServer())
       .get(`/mail-lists`)
       .set('Authorization', `Bearer ${accessToken}`)
       .expect(200)

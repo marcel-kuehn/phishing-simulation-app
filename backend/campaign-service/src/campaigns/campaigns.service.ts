@@ -46,7 +46,13 @@ export class CampaignsService {
     return this.campaignModel.deleteOne({ _id: id });
   }
 
-  async find(mailListId: mongoose.Types.ObjectId): Promise<Campaign[]> {
+  async findByOwnerId(ownerId: mongoose.Types.ObjectId): Promise<Campaign[]> {
+    return this.campaignModel.find({ ownerId }).lean().exec();
+  }
+
+  async findByMailListId(
+    mailListId: mongoose.Types.ObjectId,
+  ): Promise<Campaign[]> {
     return this.campaignModel.find({ mailListId }).lean().exec();
   }
 }

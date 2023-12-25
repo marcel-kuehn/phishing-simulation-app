@@ -51,17 +51,11 @@ export class CampaignsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get(':id')
-  async findOne(
-    @Param('id', ValidateMongoId) id: mongoose.Types.ObjectId,
+  @Get()
+  async find(
     @AuthUserId() authUserId: mongoose.Types.ObjectId,
-  ): Promise<Campaign> {
-    const campaign = await this.campaignsService.findOne(id);
-    if (!campaign) throw new NotFoundException(ErrorTypes.DOCUMENT_NOT_FOUND);
-    if (campaign.ownerId.toString() !== authUserId.toString())
-      throw new ForbiddenException(ErrorTypes.NO_ACCESS_RIGHTS_TO_RESOURCE);
-
-    return campaign;
+  ): Promise<Campaign[]> {
+    return await this.campaignsService.findByOwnerId(authUserId);
   }
 
   @UseGuards(JwtAuthGuard)

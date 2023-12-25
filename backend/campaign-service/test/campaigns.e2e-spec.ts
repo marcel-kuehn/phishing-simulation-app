@@ -149,7 +149,7 @@ describe('CampaignsController (e2e)', () => {
       .expect(400);
   });
 
-  it('/campaigns/:id (GET) should work', async () => {
+  it('/campaigns (GET) should work', async () => {
     const mailListData = await request(app.getHttpServer())
       .post('/mail-lists')
       .set('Authorization', `Bearer ${accessToken}`)
@@ -168,65 +168,18 @@ describe('CampaignsController (e2e)', () => {
       })
       .expect(201);
 
-    const test = await request(app.getHttpServer())
-      .get(`/campaigns/${createCampaignRequest.body._id}`)
+    await request(app.getHttpServer())
+      .get(`/campaigns`)
       .set('Authorization', `Bearer ${accessToken}`)
       .expect(200)
-      .expect(createCampaignRequest.body);
-
-    expect(test.body.name).toStrictEqual('Test');
-    expect(test.body.mailListId).toStrictEqual(mailListData.body._id);
-    expect(test.body.monthlyMailFrequency).toStrictEqual(30);
-    expect(test.body.ownerId).toStrictEqual(userId);
-    expect(test.body._id).toStrictEqual(createCampaignRequest.body._id);
-  });
-
-  it('/campaigns/:id (GET) should return 404, when campaign was not found', async () => {
-    await request(app.getHttpServer())
-      .get(`/campaigns/6582f7916c67fab161df17d7`)
-      .set('Authorization', `Bearer ${accessToken}`)
-      .expect(404);
+      .expect([createCampaignRequest.body]);
   });
 
   it('/campaigns/:id (GET) should not be accessible, without valid auth', async () => {
     await request(app.getHttpServer())
-      .get(`/campaigns/6582f7916c67fab161df17d7`)
+      .get(`/campaigns`)
       .set('Authorization', `Bearer 3efeawdaw`)
       .expect(401);
-  });
-
-  it('/campaigns/:id (GET) should send 403, when trying to access a campaign that is not owned', async () => {
-    const signUpRequest = await request(app.getHttpServer())
-      .post('/auth/signup')
-      .send({
-        email: `test${Date.now() * Math.floor(Math.random() * 100000)}@test.de`,
-        name: 'Mr. Bean',
-        password: 'I5_Thi5_PW_Secure?!',
-      })
-      .expect(201);
-
-    const mailListData = await request(app.getHttpServer())
-      .post('/mail-lists')
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send({
-        name: 'Test',
-      })
-      .expect(201);
-
-    const createCampaignRequest = await request(app.getHttpServer())
-      .post('/campaigns')
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send({
-        mailListId: mailListData.body._id,
-        name: 'Test',
-        monthlyMailFrequency: 30,
-      })
-      .expect(201);
-
-    await request(app.getHttpServer())
-      .get(`/campaigns/${createCampaignRequest.body._id}`)
-      .set('Authorization', `Bearer ${signUpRequest.body.accessToken}`)
-      .expect(403);
   });
 
   it('/campaigns/:id (DELETE) should work', async () => {
