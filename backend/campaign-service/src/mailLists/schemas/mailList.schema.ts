@@ -16,6 +16,4 @@ export const MailListSchema = new mongoose.Schema(
   },
 );
 
-export type MailList = mongoose.Document<
-  mongoose.InferSchemaType<typeof MailListSchema>
->;
+export type MailList = mongoose.InferSchemaType<typeof MailListSchema>;

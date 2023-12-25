@@ -22,9 +22,9 @@ export class CampaignsService {
   }
 
   async update(
-    campaign: Campaign,
+    campaign: mongoose.Document<Campaign>,
     createCampaignDto: CreateCampaignDto,
-  ): Promise<Campaign> {
+  ): Promise<mongoose.Document<Campaign>> {
     for (const property of Object.keys(createCampaignDto)) {
       campaign[property] = createCampaignDto[property];
     }
@@ -33,16 +33,20 @@ export class CampaignsService {
   }
 
   async findOne(id: mongoose.Types.ObjectId): Promise<Campaign | null> {
-    return this.campaignModel.findOne({ _id: id }).exec();
+    return this.campaignModel.findOne({ _id: id }).lean().exec();
   }
 
-  async remove(id: mongoose.Types.ObjectId): Promise<DeleteResult> {
+  async findOneAsDocument(
+    id: mongoose.Types.ObjectId,
+  ): Promise<mongoose.Document<Campaign> | null> {
+    return this.campaignModel.findOne({ _id: id });
+  }
+
+  async deleteOne(id: mongoose.Types.ObjectId): Promise<DeleteResult> {
     return this.campaignModel.deleteOne({ _id: id });
   }
 
-  async findByMailList(
-    mailListId: mongoose.Types.ObjectId,
-  ): Promise<Campaign[]> {
-    return this.campaignModel.find({ mailListId });
+  async find(mailListId: mongoose.Types.ObjectId): Promise<Campaign[]> {
+    return this.campaignModel.find({ mailListId }).lean().exec();
   }
 }

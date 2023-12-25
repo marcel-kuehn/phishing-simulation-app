@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import mongoose from 'mongoose';
 import { DeleteResult } from 'mongodb';
-import { CreateMailListDto } from '../dtos/mailList.dto';
-import { MailList } from '../schemas/mailList.schema';
+import { CreateMailListDto } from './../dtos/mailList.dto';
+import { MailList } from './../schemas/mailList.schema';
 
 @Injectable()
 export class MailListsService {
@@ -22,21 +22,27 @@ export class MailListsService {
   }
 
   async update(
-    mailList: MailList,
+    mailList: mongoose.Document<MailList>,
     createMailListDto: CreateMailListDto,
   ): Promise<MailList> {
     for (const property of Object.keys(createMailListDto)) {
       mailList[property] = createMailListDto[property];
     }
 
-    return await mailList.save();
+    return (await mailList.save()).toJSON();
   }
 
   async findOne(id: mongoose.Types.ObjectId): Promise<MailList | null> {
-    return this.mailListModel.findOne({ _id: id }).exec();
+    return this.mailListModel.findOne({ _id: id }).lean().exec();
   }
 
-  async remove(id: mongoose.Types.ObjectId): Promise<DeleteResult> {
+  async findOneAsDocument(
+    id: mongoose.Types.ObjectId,
+  ): Promise<mongoose.Document<MailList> | null> {
+    return this.mailListModel.findOne({ _id: id });
+  }
+
+  async deleteOne(id: mongoose.Types.ObjectId): Promise<DeleteResult> {
     return this.mailListModel.deleteOne({ _id: id });
   }
 }
