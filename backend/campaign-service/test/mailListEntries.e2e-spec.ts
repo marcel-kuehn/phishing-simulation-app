@@ -241,9 +241,6 @@ describe('MailListEntriesController (e2e)', () => {
         }@test.de`,
       })
       .expect(201);
-    console.log(
-      `/mail-lists/${mailList.body._id}/entries/${mailListEntry.body._id}`,
-    );
     await request(app.getHttpServer())
       .delete(
         `/mail-lists/${mailList.body._id}/entries/${mailListEntry.body._id}`,

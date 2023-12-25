@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const crypto = require('crypto');
 
 export const MailListEntrySchema = new mongoose.Schema(
@@ -13,7 +15,7 @@ export const MailListEntrySchema = new mongoose.Schema(
     },
     verificationToken: {
       type: String,
-      default: () => crypto.randomBytes(40).toString('hex'),
+      default: () => crypto.randomBytes(4).toString('hex'),
     },
     isVerified: {
       type: Boolean,
@@ -35,7 +37,7 @@ export const MailListEntrySchema = new mongoose.Schema(
     },
     unsubscribeToken: {
       type: String,
-      default: () => crypto.randomBytes(40).toString('hex'),
+      default: () => crypto.randomBytes(4).toString('hex'),
     },
   },
   {

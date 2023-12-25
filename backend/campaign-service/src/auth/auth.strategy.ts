@@ -35,7 +35,6 @@ export class RefreshTokenStrategy extends PassportStrategy(
   }
 
   async validate(request: Request, payload: any) {
-    console.log('acs2', payload);
     //const refreshToken = request.get('Authorization').replace('Bearer', '').trim();
     return { ...payload };
   }
