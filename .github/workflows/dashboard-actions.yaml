@@ -1,0 +1,35 @@
+# ci-pipeline for services
+name: dashboard-ci
+on: 
+  push:
+    paths:
+      - dashboard/**
+      - .github/workflows/dashboard-actions.yaml
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+    
+      - name: Install dependencies
+        run: yarn
+        working-directory: ./dashboard
+    
+      - name: Check format
+        run: yarn format:check
+        working-directory: ./dashboard
+
+      - name: Check linting
+        run: yarn lint:check
+        working-directory: ./dashboard
+  sast:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository code
+      uses: actions/checkout@v4
+    - name: nodejsscan scan
+      id: njsscan
+      uses: ajinabraham/njsscan-action@master
+      with:
+        args: '.'
