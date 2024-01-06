@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { StatusMessages } from './../src/constants';
+import { StatusMessages } from '../src/constants';
 import { createTestApp } from './createTestApp';
 
 describe('HealthController (e2e)', () => {
