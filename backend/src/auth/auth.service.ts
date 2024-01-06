@@ -59,6 +59,7 @@ export class AuthService {
     accessToken: string;
     refreshToken: string;
   } | null> {
+    console.log(refreshToken);
     return {
       userId,
       accessToken: await this.generateAccessToken(userId),

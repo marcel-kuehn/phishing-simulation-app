@@ -6,7 +6,7 @@ on:
       - backend/**
       - .github/workflows/backend-actions.yaml
 jobs:
-  test:
+  ci:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
