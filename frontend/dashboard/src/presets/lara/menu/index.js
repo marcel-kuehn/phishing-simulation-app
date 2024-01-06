@@ -4,12 +4,8 @@ export default {
       // Sizing and Shape
       'min-w-[12rem]',
       'rounded-md',
-      // Spacing
-      'py-2',
       // Colors
-      'bg-surface-0 dark:bg-surface-700',
       'text-surface-700 dark:text-white/80',
-      'border border-surface-200 dark:border-surface-700'
     ]
   },
   menu: {
@@ -47,8 +43,8 @@ export default {
       'items-center',
 
       // Spacing
-      'py-3',
-      'px-5',
+      'py-4',
+      'px-4',
 
       // Color
       'text-surface-700 dark:text-white/80',

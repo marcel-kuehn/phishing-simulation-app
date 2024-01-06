@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 import axios from 'axios';
-
 export interface AuthStore {
     userId: string;
     accessToken: string;
@@ -19,10 +18,30 @@ const getAuthData = (): AuthStore => {
     return authData ? JSON.parse(authData) : getDefaultAuthData()
 }
 
+export const api = axios.create({
+    baseURL: import.meta.env.VITE_API_BASE_URL,
+});
+  
+api.interceptors.request.use(
+    (config) => {
+        const token = getAuthData().accessToken;
+
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
+
 export const useAuthStore = defineStore('auth', {
     state: getAuthData,
     actions: {
-        updateStore(userId, accessToken, refreshToken): void {
+        updateStore(userId: string, accessToken: string, refreshToken: string): void {
             this.userId = userId;
             this.accessToken = accessToken;
             this.refreshToken = refreshToken;
@@ -31,8 +50,8 @@ export const useAuthStore = defineStore('auth', {
         },
         async signUp(name: string, email: string, password: string): Promise<void> {
             try {
-                const response = await axios.post(
-                    `${import.meta.env.VITE_API_BASE_URL}/auth/signup`,
+                const response = await api.post(
+                    `/auth/signup`,
                     { name, email, password }
                 );
 
@@ -45,8 +64,8 @@ export const useAuthStore = defineStore('auth', {
         },
         async signIn(email: string, password: string): Promise<void> {
             try {
-                const response = await axios.post(
-                    `${import.meta.env.VITE_API_BASE_URL}/auth/signin`,
+                const response = await api.post(
+                    `/auth/signin`,
                     { email, password }
                 );
 
@@ -57,5 +76,37 @@ export const useAuthStore = defineStore('auth', {
                 throw error;
             }
         },
+        async verifySession(): Promise<void> {
+            try {
+                await api.get(
+                    `/auth/verify-session`,
+                );                
+            } catch (error) {
+                console.error("Session Invalid", error);
+                this.updateStore("", "", "");
+                throw error;
+            }
+        },
+        async refreshSession(): Promise<void> {
+            if(this.refreshToken === "") return;
+
+            try {
+                const response = await api.post(
+                    `/auth/session-refresh`,
+                    { refreshToken: this.refreshToken }
+                );                
+                const { userId, accessToken, refreshToken } = response.data;
+                this.updateStore(userId, accessToken, refreshToken);
+            } catch (error) {
+                console.error("Session Invalid", error);
+                this.updateStore("", "", "");
+            }
+        }
     }
 });
+
+export const startSessionRefreshLoop = async () => {
+    const authStore = useAuthStore();
+    await authStore.refreshSession();
+    setInterval(authStore.refreshSession, 60000);
+};
