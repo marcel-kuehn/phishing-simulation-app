@@ -1,9 +1,4 @@
-import {
-  Controller,
-  Get,
-  NotFoundException,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, NotFoundException, UseGuards } from '@nestjs/common';
 import { ErrorTypes } from '../constants';
 import mongoose from 'mongoose';
 import { JwtAuthGuard } from '../auth/auth.guard';
