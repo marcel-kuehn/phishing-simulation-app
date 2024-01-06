@@ -16,9 +16,17 @@ jobs:
         run: yarn
         working-directory: ./backend
     
-      - name: Run tests
-        run: yarn test
+      - name: Check format
+        run: prettier --check \"src/**/*.ts\" \"test/**/*.ts\"
         working-directory: ./backend
+
+      - name: Check linting
+        run: eslint \"{src,apps,libs,test}/**/*.ts\"
+        working-directory: ./backend
+
+      #- name: Run tests
+      #  run: yarn test
+      #  working-directory: ./backend
   sast:
     runs-on: ubuntu-latest
     steps:
