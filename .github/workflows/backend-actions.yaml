@@ -17,11 +17,11 @@ jobs:
         working-directory: ./backend
     
       - name: Check format
-        run: prettier --check \"src/**/*.ts\" \"test/**/*.ts\"
+        run: yarn format:check
         working-directory: ./backend
 
       - name: Check linting
-        run: eslint \"{src,apps,libs,test}/**/*.ts\"
+        run: yarn lint:check
         working-directory: ./backend
 
       #- name: Run tests
