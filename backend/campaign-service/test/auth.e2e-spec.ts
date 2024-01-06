@@ -129,12 +129,12 @@ describe('AuthController (e2e)', () => {
       .send({ email, name: 'Mr. Bean', password: 'I5_Thi5_PW_Secure?!' })
       .expect(201);
       
-      console.log(response.body)
     const refreshRequest = await request(app.getHttpServer())
       .post(`/auth/session-refresh`)
       .send({refreshToken: response.body.refreshToken})
       .set('Authorization', `Bearer ${response.body.accessToken}`)
       .expect(201)
+      
     expect(refreshRequest.body.userId).toBeDefined();
     expect(refreshRequest.body.refreshToken).toBeDefined();
     expect(refreshRequest.body.accessToken).toBeDefined();
