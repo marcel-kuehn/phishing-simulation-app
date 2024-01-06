@@ -33,3 +33,9 @@ export class SignUpDto {
   @MaxLength(64)
   readonly name: string;
 }
+
+export class SessionRefreshDto {
+  @IsString()
+  @MinLength(1)
+  readonly refreshToken: string;
+}

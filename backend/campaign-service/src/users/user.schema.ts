@@ -2,6 +2,10 @@ import mongoose from 'mongoose';
 
 export const UserSchema = new mongoose.Schema(
   {
+    name: {
+      type: String,
+      required: true,
+    },
     email: {
       type: String,
       required: true,
@@ -17,4 +21,5 @@ export const UserSchema = new mongoose.Schema(
   },
 );
 
-export type User = mongoose.InferSchemaType<typeof UserSchema>;
+export type InferedUser = mongoose.InferSchemaType<typeof UserSchema>;
+export type User = {_id: mongoose.Types.ObjectId } & InferedUser;

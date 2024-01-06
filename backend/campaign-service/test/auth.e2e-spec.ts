@@ -101,4 +101,42 @@ describe('AuthController (e2e)', () => {
 
     request(app.getHttpServer()).post('/auth/signin').expect(401);
   });
+
+  it('/auth/verify-session (GET) should work', async () => {
+    const email = `test${Date.now()}@test.de`;
+    const response = await request(app.getHttpServer())
+      .post('/auth/signup')
+      .send({ email, name: 'Mr. Bean', password: 'I5_Thi5_PW_Secure?!' })
+      .expect(201);
+
+    await request(app.getHttpServer())
+      .get(`/auth/verify-session`)
+      .set('Authorization', `Bearer ${response.body.accessToken}`)
+      .expect(200)
+  });
+
+  it('/auth/verify-session (GET) should not be accessible, without valid auth', async () => {
+    await request(app.getHttpServer())
+      .get(`/auth/verify-session`)
+      .set('Authorization', `Bearer 3efeawdaw`)
+      .expect(401);
+  });
+
+  it('/auth/refresh (POST) should work', async () => {
+    const email = `test${Date.now()}@test.de`;
+    const response = await request(app.getHttpServer())
+      .post('/auth/signup')
+      .send({ email, name: 'Mr. Bean', password: 'I5_Thi5_PW_Secure?!' })
+      .expect(201);
+      
+    const refreshRequest = await request(app.getHttpServer())
+      .post(`/auth/session-refresh`)
+      .send({refreshToken: response.body.refreshToken})
+      .set('Authorization', `Bearer ${response.body.accessToken}`)
+      .expect(201)
+      
+    expect(refreshRequest.body.userId).toBeDefined();
+    expect(refreshRequest.body.refreshToken).toBeDefined();
+    expect(refreshRequest.body.accessToken).toBeDefined();
+  });
 });

@@ -9,3 +9,13 @@ export const AuthUserId = createParamDecorator(
     }
   },
 );
+
+export const RefreshData = createParamDecorator(
+  (_data: any, ctx: ExecutionContext) => {
+    const req = ctx.switchToHttp().getRequest();
+
+    if (!!req.user) {
+      return req.user;
+    }
+  },
+);
