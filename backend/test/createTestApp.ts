@@ -4,12 +4,12 @@ import {
   INestApplication,
   ValidationPipe,
 } from '@nestjs/common';
-import { AppModule } from './../src/app.module';
-import { ErrorTypes } from './../src/constants';
+import { AppModule } from '../src/app.module';
+import { ErrorTypes } from '../src/constants';
 import {
   MongoDuplicationErrorFilter,
   MongoValidationErrorFilter,
-} from './../src/database/database.filters';
+} from '../src/database/database.filters';
 
 export const createTestApp = async (): Promise<INestApplication> => {
   const moduleFixture: TestingModule = await Test.createTestingModule({

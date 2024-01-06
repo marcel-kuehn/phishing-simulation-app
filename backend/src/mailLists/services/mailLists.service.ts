@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import mongoose from 'mongoose';
 import { DeleteResult } from 'mongodb';
-import { CreateMailListDto } from './../dtos/mailList.dto';
-import { MailList } from './../schemas/mailList.schema';
+import { CreateMailListDto } from '../dtos/mailList.dto';
+import { MailList } from '../schemas/mailList.schema';
 
 @Injectable()
 export class MailListsService {
