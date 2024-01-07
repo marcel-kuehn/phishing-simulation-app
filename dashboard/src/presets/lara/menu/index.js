@@ -5,7 +5,7 @@ export default {
       'min-w-[12rem]',
       'rounded-md',
       // Colors
-      'text-surface-700 dark:text-white/80',
+      'text-surface-700 dark:text-white/80'
     ]
   },
   menu: {

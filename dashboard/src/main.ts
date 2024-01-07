@@ -16,9 +16,8 @@ startSessionRefreshLoop().then(() => {
   app.use(router)
   app.use(PrimeVue, {
     unstyled: true,
-    pt: Lara,
+    pt: Lara
   })
 
   app.mount('#app')
-});
-
+})

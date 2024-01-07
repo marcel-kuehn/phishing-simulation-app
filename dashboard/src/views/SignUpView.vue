@@ -20,7 +20,7 @@
         </div>
         <div class="flex flex-col gap-2">
           <label for="password">Password</label>
-          <InputText v-model="password" type="password" class="w-full block"/>
+          <InputText v-model="password" type="password" class="w-full block" />
         </div>
       </div>
     </template>
@@ -40,7 +40,6 @@ import Button from 'primevue/button'
 import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
-
 const authStore = useAuthStore()
 const router = useRouter()
 
@@ -49,10 +48,9 @@ const email = ref<string>('')
 const password = ref<string>('')
 
 const signUp = async (): Promise<void> => {
-  await authStore.signUp(name.value, email.value, password.value);
-  router.push({name: 'dashboard'});
+  await authStore.signUp(name.value, email.value, password.value)
+  router.push({ name: 'dashboard' })
 }
-
 </script>
 
 <style scoped></style>

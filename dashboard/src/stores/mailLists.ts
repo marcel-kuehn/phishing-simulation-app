@@ -1,32 +1,30 @@
-import { defineStore } from "pinia";
-import { api } from "./auth";
+import { defineStore } from 'pinia'
+import { api } from './auth'
 
 export interface MailList {
-    _id: string;
+  _id: string
 }
 
 export interface MailListsStore {
-    mailLists: MailList[];
+  mailLists: MailList[]
 }
 
 const getDefaultData = (): MailListsStore => ({
-    mailLists: [],
-});
+  mailLists: []
+})
 
 export const useMailListsStore = defineStore('mailLists', {
-    state: getDefaultData,
-    actions: {
-        async getMailLists(): Promise<void> {
-            try {
-                const response = await api.get(
-                    `/mail-lists`,
-                );
+  state: getDefaultData,
+  actions: {
+    async getMailLists(): Promise<void> {
+      try {
+        const response = await api.get(`/mail-lists`)
 
-                this.mailLists = response.data;
-            } catch (error) {
-                console.error("Could not get maillists", error);
-                throw error;
-            }
-        },
+        this.mailLists = response.data
+      } catch (error) {
+        console.error('Could not get maillists', error)
+        throw error
+      }
     }
-});
+  }
+})
