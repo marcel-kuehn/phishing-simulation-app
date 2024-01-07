@@ -51,12 +51,15 @@ export class AuthService {
     };
   }
 
-  async getNewTokensIfRefreshTokenMatches(userId: mongoose.Types.ObjectId, refreshToken: string): Promise<{
+  async getNewTokensIfRefreshTokenMatches(
+    userId: mongoose.Types.ObjectId,
+    refreshToken: string,
+  ): Promise<{
     userId: mongoose.Types.ObjectId;
     accessToken: string;
     refreshToken: string;
   } | null> {
-
+    console.log(refreshToken);
     return {
       userId,
       accessToken: await this.generateAccessToken(userId),

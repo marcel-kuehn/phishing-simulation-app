@@ -112,7 +112,7 @@ describe('AuthController (e2e)', () => {
     await request(app.getHttpServer())
       .get(`/auth/verify-session`)
       .set('Authorization', `Bearer ${response.body.accessToken}`)
-      .expect(200)
+      .expect(200);
   });
 
   it('/auth/verify-session (GET) should not be accessible, without valid auth', async () => {
@@ -128,13 +128,13 @@ describe('AuthController (e2e)', () => {
       .post('/auth/signup')
       .send({ email, name: 'Mr. Bean', password: 'I5_Thi5_PW_Secure?!' })
       .expect(201);
-      
+
     const refreshRequest = await request(app.getHttpServer())
       .post(`/auth/session-refresh`)
-      .send({refreshToken: response.body.refreshToken})
+      .send({ refreshToken: response.body.refreshToken })
       .set('Authorization', `Bearer ${response.body.accessToken}`)
-      .expect(201)
-      
+      .expect(201);
+
     expect(refreshRequest.body.userId).toBeDefined();
     expect(refreshRequest.body.refreshToken).toBeDefined();
     expect(refreshRequest.body.accessToken).toBeDefined();

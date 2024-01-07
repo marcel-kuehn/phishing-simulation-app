@@ -22,4 +22,4 @@ export const UserSchema = new mongoose.Schema(
 );
 
 export type InferedUser = mongoose.InferSchemaType<typeof UserSchema>;
-export type User = {_id: mongoose.Types.ObjectId } & InferedUser;
+export type User = { _id: mongoose.Types.ObjectId } & InferedUser;

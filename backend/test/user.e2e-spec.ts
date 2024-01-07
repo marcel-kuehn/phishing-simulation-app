@@ -5,7 +5,6 @@ import { createTestApp } from './createTestApp';
 describe('MailListsController (e2e)', () => {
   let app: INestApplication;
   let accessToken: string;
-  let userId: string;
 
   beforeEach(async () => {
     app = await createTestApp();
@@ -21,7 +20,6 @@ describe('MailListsController (e2e)', () => {
       .expect(201);
 
     accessToken = test.body.accessToken;
-    userId = test.body.userId;
   });
 
   it('/users/me (GET) should work', async () => {
@@ -37,7 +35,7 @@ describe('MailListsController (e2e)', () => {
   });
 
   it('/users/me (GET) should not be accessible without valid out', async () => {
-    const test = await request(app.getHttpServer())
+    await request(app.getHttpServer())
       .get('/users/me')
       .set('Authorization', `Bearer eawdawdwa`)
       .send()

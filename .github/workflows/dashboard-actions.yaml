@@ -1,10 +1,10 @@
 # ci-pipeline for services
-name: backend-ci
+name: dashboard-ci
 on: 
   push:
     paths:
-      - backend/**
-      - .github/workflows/backend-actions.yaml
+      - dashboard/**
+      - .github/workflows/dashboard-actions.yaml
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -14,16 +14,12 @@ jobs:
     
       - name: Install dependencies
         run: yarn
-        working-directory: ./backend
+        working-directory: ./dashboard
     
       - name: Check format
         run: yarn format:check
-        working-directory: ./backend
+        working-directory: ./dashboard
 
       - name: Check linting
         run: yarn lint:check
-        working-directory: ./backend
-
-      #- name: Run tests
-      #  run: yarn test
-      #  working-directory: ./backend
+        working-directory: ./dashboard
